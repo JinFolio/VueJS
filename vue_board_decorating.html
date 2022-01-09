@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+
+    
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
+    
+    
+    
+    <title>board</title>
+    <style>
+        .addBtn {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            font-size: 30px;
+            padding: 10px;
+            color: #f5b914;
+        }
+
+        i {
+            cursor: pointer;
+        }
+
+        .listTitle {
+            margin-bottom: 10px;
+            background-color: #f5b914;
+            font-weight: bold;
+            padding: 5px 0;
+        }
+
+        .listInner {
+            margin-bottom: 10px;
+            background-color: #dedede;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div style="max-width: 800px; margin: 10px;">
+            <div class="md-layout">
+                <div class="md-layout-item md-size-70">
+                    <h1>Todo List</h1>
+                </div>
+                <div class="md-layout-item md-size-30">
+                    <md-field>
+                        <label for="search">Search for</label>
+                        <md-input v-model="search" />
+                    </md-field>
+                </div>
+
+                <div class="md-layout">
+                    <div class="md-layout-item md-size-100">
+
+                        <div class="md-layout listTitle">
+                            <div class="md-layout-item md-size-30 text-info">SUBJECT</div>
+                            <div class="md-layout-item md-size-50 text-info">DESCRIPTION</div>
+                        </div>
+
+<!--                        가공된 리스트 값을 받아서 출력한다.    -->
+                        <div class="md-layout listInner" v-for="(listItem, index) in sortedData" 
+                           :key="index">
+                            <div class="md-layout-item md-size-30 text-info"> {{ listItem.subject }} </div>
+                            <div class="md-layout-item md-size-50 text-info"> {{ listItem.desc }} </div>
+
+                            <div class="md-layout-item md-size-10 text-info">
+                                <i class="fas fa-edit" @click="onEdit(index)"></i>
+                            </div>
+                            <div class="md-layout-item md-size-10 text-info">
+                                <i class="fas fa-trash-alt" @click="onRemove(index)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <i class="fas fa-plus-circle addBtn" @click="onAdd"></i>
+                </div>
+            </div>
+
+            <div>
+                <md-dialog :md-active.sync="addDialog" @keydown.esc="closeDialog">
+                    <md-dialog-title>추가 Add</md-dialog-title>
+
+                    <md-dialog-content>
+                        <md-field>
+                            <label for="subject">subject</label>
+                            <md-input v-model="newData.subject" />
+                        </md-field>
+
+                        <md-field>
+                            <label for="description">description</label>
+                            <md-input v-model="newData.desc" @keydown.enter="submit" required />
+                        </md-field>
+                    </md-dialog-content>
+
+                    <md-dialog-actions>
+                        <md-button class="md-primary" @click="closeDialog">Close</md-button>
+                        <md-button class="md-primary" @click="submit">Save</md-button>
+                    </md-dialog-actions>
+                </md-dialog>
+
+                <md-dialog :md-active.sync="editDialog" @keydown.esc="closeDialog">
+                    <md-dialog-title>수정 Edit</md-dialog-title>
+
+                    <md-dialog-content>
+                        <md-field>
+                            <label for="subject">subject</label>
+                            <md-input v-model="selectedData.subject" />
+                        </md-field>
+
+                        <md-field>
+                            <label for="description">description</label>
+                            <md-input v-model="selectedData.desc" @keydown.enter="editedSubmit" 
+                            required />
+                        </md-field>
+                    </md-dialog-content>
+
+                    <md-dialog-actions>
+                        <md-button class="md-primary" @click="closeDialog">Close</md-button>
+                        <md-button class="md-primary" @click="editedSubmit">Save</md-button>
+                    </md-dialog-actions>
+                </md-dialog>
+
+                <md-dialog :md-active.sync="removeDialog" @keydown.esc="closeDialog" 
+                   @keydown.enter="removeData">
+                    <md-dialog-title>삭제 Remove</md-dialog-title>
+
+                    <md-dialog-content>
+                        정말 삭제 하시겠습니까?
+                    </md-dialog-content>
+
+                    <md-dialog-actions>
+                        <md-button class="md-primary" @click="closeDialog">Cancel</md-button>
+                        <md-button class="md-primary" @click="removeData">Confirm</md-button>
+                    </md-dialog-actions>
+                </md-dialog>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material"></script>
+
+    <script>
+        Vue.use(VueMaterial.default);
+        //api 통신 대체용 test data
+
+
+        const testData = [{
+            "id": 41,
+            "subject": "Finland",
+            "desc": "Calera de Tango"
+        }, {
+            "id": 42,
+            "subject": "Lesotho",
+            "desc": "Ancarano"
+        }, {
+            "id": 43,
+            "subject": "Western Sahara",
+            "desc": "Cochamó"
+        }, {
+            "id": 44,
+            "subject": "Guernsey",
+            "desc": "Villers-lez-Heest"
+        }, {
+            "id": 45,
+            "subject": "Turkey",
+            "desc": "Liedekerke"
+        }, {
+            "id": 46,
+            "subject": "Dominica",
+            "desc": "Nanterre"
+        }, {
+            "id": 47,
+            "subject": "Saint Helena, Ascension and Tristan da Cunha",
+            "desc": "Crato"
+        }, {
+            "id": 48,
+            "subject": "Czech Republic",
+            "desc": "Lossiemouth"
+        }, {
+            "id": 49,
+            "subject": "Croatia",
+            "desc": "Sale"
+        }, {
+            "id": 50,
+            "subject": "South Georgia and The South Sandwich Islands",
+            "desc": "North Shore"
+        }, {
+            "id": 51,
+            "subject": "Malawi",
+            "desc": "Newtonmore"
+        }, {
+            "id": 52,
+            "subject": "Marshall Islands",
+            "desc": "Piracicaba"
+        }, {
+            "id": 53,
+            "subject": "Nepal",
+            "desc": "Ponoka"
+        }, {
+            "id": 54,
+            "subject": "Gibraltar",
+            "desc": "Rabbi"
+        }, {
+            "id": 55,
+            "subject": "Åland Islands",
+            "desc": "Biarritz"
+        }, {
+            "id": 56,
+            "subject": "Nepal",
+            "desc": "Sant'Elia a Pianisi"
+        }]
+
+
+
+
+
+        new Vue({
+            el: '#app',
+            data: {
+                addDialog: false,
+                editDialog: false,
+                removeDialog: false,
+                listData: [],
+                search: '',
+                searchedData: [],
+                curSelecdtIndex: 0, //선택한 index
+                first: false,
+                second: false,
+
+                newData: {
+                    id: Number,
+                    subject: '',
+                    desc: ''
+                },
+                selectedData: {
+                    id: Number,
+                    subject: '',
+                    desc: ''
+                }
+
+            },
+
+
+
+            created() {
+                // this.listData = testData;
+            },
+
+            
+            
+
+            // data에서 내부 변수를 선언하는데, computed는 무엇일까?
+            // template 에서 data의 변수를 그냥 노출하는게 아니라, 연산하는 경우... 
+            // template 코드가 복잡해진다. 
+            // 이를 방지하고자 하는 것이 computed 
+            
+            
+//            함수로 정의하고 data객체 등을 사용하여 계산된 값을 리턴해 줌. 
+//            methods와 차이점은 캐싱을 시켜놓고 동일한 요청이 또 올 경우는 
+//            함수를 실행하지 않고 캐싱된 값만 리턴해 줌
+
+
+            computed: {
+                //여기서 오타등의 에러가 났을 경우, toLowerCase function이 없다는 에러메시지 나옴
+                sortedData() {
+                    if (this.search) {
+                        //listData filter 후, 검색한 데이터(결과값)를 listData에 할당
+                        this.searchedData = this.listData.filter(
+                            (data) => {
+                                return data.subject.toLowerCase().includes(this.search.toLowerCase());
+                            });
+
+                        return this.listData = this.searchedData;
+                    } else {
+                        //데이터가 없을 경우, 전체 리스트 출력
+                        return this.listData = testData;
+                    }
+                }
+            },
+
+
+            
+
+            // vue 내부 메소드를 선언하는 부분이다. 
+            // 그냥 methods 안에 넣고 싶은 메소드를 마음껏 넣으면 된다.
+
+//            함수로 정의하고 data객체 등을 사용하여 계산된 값을 리턴해 줌. 
+//            computed와 차이점은 캐싱이 되지 않고 호출될때마다 계속 함수를 실행함
+
+
+            
+            methods: {
+
+                // 추가 로직 처리
+                submit() {
+                    const submitData = {
+                        id: this.newData.id,
+                        subject: this.newData.subject,
+                        desc: this.newData.desc
+                    }
+
+                    //console.log(submitData);
+                    this.listData.push(submitData);
+                    this.closeDialog();
+                    this.clearData();
+                },
+
+                // 수정 로직 처리
+                editedSubmit(index) {
+                    const editedData = {
+                        id: this.selectedData.id,
+                        subject: this.selectedData.subject,
+                        desc: this.selectedData.desc,
+                    }
+
+                    //this.listData.push(editedData); 가 아님
+                    //해당 위치에 데이터 추가: splice(해당 index, 갯수, 추가할 데이터)
+                    this.listData.splice(this.curSelecdtIndex, 1, editedData);
+                    this.closeDialog();
+                },
+
+                // 삭제 로직 처리
+                removeData() {
+                    //데이터 삭제: splice(해당 index, 갯수)
+                    this.listData.splice(this.curSelecdtIndex, 1);
+                    this.removeDialog = false;
+                },
+
+                // 추가하기 팝업창 열기
+                onAdd() {
+                    this.addDialog = true;
+                },
+
+                // 수정하기 팝업창 열기
+                onEdit(index) {
+                    this.editDialog = true;
+
+                    this.curSelecdtIndex = index;
+                    this.selectedData.id = this.listData[this.curSelecdtIndex].id;
+                    this.selectedData.subject = this.listData[this.curSelecdtIndex].subject;
+                    this.selectedData.desc = this.listData[this.curSelecdtIndex].desc;
+                },
+
+                // 삭제하기 팝업창 열기
+                onRemove(index) {
+                    this.removeDialog = true;
+                    //현재 index번호를 보내주어야, removeDialog창에서 confirm 클릭후
+                    //해당 list를 지울수 있음
+                    this.curSelecdtIndex = index;
+                },
+
+                // 추가, 수정, 삭제 팝업창 취소 (닫기)
+                closeDialog() {
+                    this.addDialog = false;
+                    this.editDialog = false;
+                    this.removeDialog = false;
+                },
+
+                // 추가 로직 수행 후 추가 팝업창에 입력한 값을 지우는 로직.
+                clearData(key) {
+                    for (let key in this.newData) {
+                        this.newData[key] = '';
+                    }
+                },
+                
+            }
+            
+            
+//            watch : 지정된 변수를 계속 지켜보고 있다가 값이 변경되었을때 정의된 함수를 실행시킴
+//            watch : 지정된 변수를 계속 지켜보고 있다가 값이 변경되었을때 정의된 함수를 실행시킴
+
+
+        })
+    </script>
+</body>
+
+</html>

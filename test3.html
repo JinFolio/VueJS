@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Insert title here</title>
+    
+<!--
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/nprogress.css" rel="stylesheet">
+-->
+    
+<link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
+
+    
+<style>
+
+    body {font-size:10pt;}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="app" class="container">{{ responseMsg }}
+
+    <table class="table table-striped table-hover">
+
+        <thead>
+
+            <th>No.</th>
+
+            <th>Title</th>
+
+            <th>Created</th>
+
+            <th>Date</th>
+
+            <th>Hit</th>
+
+        </thead>
+
+        <tbody
+
+            is="my-list"
+
+            v-for="(data, index) in dataList"
+
+            v-bind:no="data.no"
+
+            v-bind:title="data.title"
+
+            v-bind:created="data.created"
+
+            v-bind:date="data.date"
+
+            v-bind:hit="data.hit">
+
+        </tbody>
+
+    </table>
+
+
+
+    <div class="d-flex justify-content-center">
+
+        <page-component v-html:pagetag="paging"></page-component>
+
+    </div>
+
+
+
+</div>
+
+<!--
+<script src="js/vue.js"></script>
+<script src="js/axios.js"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/es6-promise.auto.min.js"></script>
+<script src="js/es6-promise.min.js"></script>
+<script src="js/nprogress.js"></script>
+-->
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/vue-material"></script>
+<!--	<script type="text/javascript" src="https://unpkg.com/nprogress@1.0.0-1/dist/nprogress.js"></script>-->
+	<script type="text/javascript" src="https://unpkg.com/nprogress@1.0.0-0/dist/nprogress.js"></script>
+    
+    
+<!-- 글목록 template script -->
+
+<script type="text/x-template" id="list-template">
+
+	<tr>
+
+    	<td>{{ no }}</td>
+
+        <td>{{ title }}</td>
+
+        <td>{{ created }}</td>
+
+        <td>{{ date }}</td>
+
+        <td>{{ hit }}</td>
+
+    </tr>
+
+</script>
+
+
+
+<script>
+
+	// 글 목록 component
+
+	// {{ }} 이 태그가 보였다 사라지는 것을 방지
+
+    Vue.component('my-list', {
+
+        template: '#list-template',
+
+        props: ['no', 'title', 'created', 'date', 'hit']
+
+    })
+
+	
+
+    // 페이징 component
+
+    Vue.component('page-component', {
+
+    	template: '<ul class="pagination">{{ pagetag }}</ul>',
+
+    	props: ['pagetag']
+
+    })
+
+
+
+    // 페이지 클릭 이벤트가 vue 안에서 안먹혀서 이쪽으로 호출 후 vue로 다시 호출 
+
+    function movepage(params, pageNumber) {
+
+    	vm.movepage(params, pageNumber);
+
+    }
+
+    
+
+// Vue 
+
+    var vm = new Vue({
+
+        el: '#app',
+
+        data: {
+
+        	showModal: false,
+
+            dataList: [
+                {
+
+                    no: 1,
+
+                    title: 'test',
+
+                    created: '-뷰created내용',
+
+                    date: '2018-01-01',
+
+                    hit: 100
+
+                }
+
+                , {
+
+                    no: 2,
+
+                    title: 'test2',
+
+                    created: '-뷰created내용',
+
+                    date: '2018-01-02',
+
+                    hit: 1000
+
+                }
+                , {
+
+                    no: 2,
+
+                    title: 'test2',
+
+                    created: '2-뷰created내용',
+
+                    date: '2018-01-02',
+
+                    hit: 1000
+
+                }
+                , {
+
+                    no: 3,
+
+                    title: 'test33',
+
+                    created: '333-뷰created내용',
+
+                    date: '2018-01-02',
+
+                    hit: 1000
+
+                }
+                , {
+
+                    no: 4,
+
+                    title: '44test2',
+
+                    created: '44-뷰created내용',
+
+                    date: '2018-01-02',
+
+                    hit: 1000
+
+                }
+                , {
+
+                    no: 5,
+
+                    title: '555test2',
+
+                    created: '5555-뷰created내용',
+
+                    date: '2018-01-02',
+
+                    hit: 1000
+
+                }
+                , {
+
+                    no: 6,
+
+                    title: '6test2',
+
+                    created: '666-뷰created내용',
+
+                    date: '2018-01-02',
+
+                    hit: 1000
+
+                }
+                
+                         
+            ],						// 리스트데이터
+
+            responseMsg: '',				// 반환받은 메시지
+
+            paging: '',
+
+            params: '',
+
+            nowPage: 1,					// 현재 페이지 번호
+
+            totalCount: 1000,				// 전체 카운트
+
+            pageCount: 3,				// 페이지당 보여줄 하단 번호 수
+
+            pageRecordCount: 3				// 페이지당 보여줄 레코드 수
+
+        },
+
+        beforeCreate: function() {
+
+       	    NProgress.start();
+
+       	    NProgress.set(0, 4);
+
+        },
+
+        methods: {
+
+        	getList: function() {
+
+                this.page(this.totalCount);
+
+        	},
+
+        	// 글목록
+
+            /*
+
+        	getList: function() {
+
+                axios.get('getList', {
+
+                    params: {
+
+                    	params: vm.params
+
+                    }
+
+                })
+
+                //성공
+
+                .then(function(response) {
+
+                    vm.responseMsg = response
+
+                    //vm.dataList = response.data.serverlist //서블릿 호출하면 아래 데이터를 불러옵니다.
+
+                   	"{\"serverlist\": [{\"no\":\"2\", \"title\":\"22222222222\", \"created\":\"chang\", \"date\":\"2018-08-01\", \"hit\":\"10\"}, {\"no\":\"1\", \"title\":\"11111111\", \"created\":\"chang\", \"date\":\"2018-08-01\", \"hit\":\"10\"}], \"totalCount\":\"1000\"}";
+
+                    vm.totalCount = response.data.totalCount
+
+                    
+
+                    vm.page(vm.totalCount)
+
+                })
+
+                //실패
+
+                .catch(function(error) {
+
+                    vm.msg = error.message
+
+                })
+
+            },*/
+
+            //페이지 클릭
+
+            movepage: function(params, pageNumber) {
+
+            	NProgress.start();
+
+           	NProgress.set(0, 4);
+
+           		
+
+		this.params = params
+
+            	this.nowPage = pageNumber;
+
+            	
+
+            	this.getList();
+
+            },
+
+            //페이지 번호 목록 나열
+
+            page: function(totalCount) { // 페이징
+
+            	if (this.nowPage == 0) this.nowPage = 1
+
+            	
+
+            	var totalPage = Math.ceil(totalCount / this.pageRecordCount + ((totalCount % this.pageRecordCount)>0 ? 1 : 0));
+
+    		if(this.nowPage > totalPage){
+
+    		    this.nowPage = totalPage;
+
+    		}
+
+        	var startRownum = (this.nowPage - 1) * this.pageRecordCount + 1
+
+        	var endRownum = this.nowPage * this.pageRecordCount
+
+				
+
+        	var groupNo = Math.floor(this.nowPage / this.pageCount + (this.nowPage % this.pageCount > 0 ? 1:0))
+
+        	var endPage = groupNo * this.pageCount
+
+        	var startPage = endPage - (this.pageCount - 1)
+
+        		
+
+        	if (endPage > totalPage) {
+
+        	    endPage = totalPage
+
+        	}
+
+		var prevPage = startPage - this.pageCount
+
+		var nextPage = startPage + this.pageCount
+
+		if(prevPage < 1){
+
+		prevPage = 1
+
+		}
+
+		if(nextPage > totalPage){
+
+		nextPage = totalPage
+
+		}
+
+				
+
+        	this.paging = ""
+
+
+
+        	if (nextPage <= 11) {
+
+        	    this.paging = "<li class='page-item disabled'><span class='page-link'>Previous</span></li>"
+
+        	} else {
+
+        	    this.paging = "<li class='page-item'><a class='page-link' href=\"javascript:movepage('"+this.params+"', "+(startPage - this.pageCount)+")\" aria-label='Previous'><span aria-hidden='true'>Previous</span></a></li>"
+
+        	}
+
+
+
+        	for (var i = startPage; i <= endPage; i++) {
+
+        	    if (i == this.nowPage) {
+
+        		this.paging += "<li class='page-item active'><span class='page-link'>"+i+"<span class='sr-only'>(current)</span></span></li>"
+
+        	    } else {
+
+        		this.paging += "<li class='page-item'><a class='page-link' href=\"javascript:movepage('"+this.params+"', "+i+")\">"+i+"<span class='sr-only'>"+i+"</span></a></li>"
+
+        	    }
+
+        	}
+
+
+
+        	if (nextPage != totalPage) {
+
+        	    this.paging += "<li class='page-item'><a class='page-link' href=\"javascript:movepage('"+this.params+"', "+(startPage + this.pageCount)+")\" aria-label='Next'><span aria-hidden='true'>Next</span></a></li>"
+
+        	} else {
+
+        	    this.paging += "<li class='page-item disabled'><span class='page-link'>Next</span></li>"
+
+        	}
+
+        		
+
+        	    //프로그래스바종료
+
+        	    NProgress.done()
+
+            }
+
+            
+
+        }
+
+    })
+
+    vm.getList()
+
+</script>
+
+</body>
+
+</html>
+
+
+
+

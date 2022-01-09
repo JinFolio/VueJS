@@ -1,0 +1,927 @@
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<template>
+
+    <div>
+
+        <!-- search -->
+        <section id="contArea" class="search">
+            <!-- default -->
+            <form name="CarSearchForm" id="CarSearchForm">
+                <div class="defaultSearch">
+                    <!-- 클래스 -->
+                    <div>
+                        <h2>클래스</h2>
+                        <ul>
+                            <li>
+                                <input type="checkbox" name="ClassIndexAll" id="allCheck1" value="ClassIndex" class="searchChk" v-on:click="allClick($event, 'classCodes')"/>
+                                <label for="allCheck1">전체선택 
+                                    <span v-if="filterCnt.classCnt['all'] > 0" id="TotalCountClassIndex">({{StringUtil.nvl(filterCnt.classCnt['all'], '0')}})</span>
+                                </label>
+                                <ul id="SearchClass">
+                                    <li v-for="(item, index) in searchOptions.classCodes" :key="index">
+                                        <span v-if="!filterChk">
+                                            <input type="checkbox" class="searchChk classCodes" name="ClassIndex" v-bind:id="`ClassIndex_${index}`" v-bind:value="item.autoClass" v-model="paramOptions.classCodes" :disabled="StringUtil.nvl(filterCnt.classCnt[item.autoClass], '0') == '0'"/>
+                                            <label v-bind:for="`ClassIndex_${index}`">{{item.className}}
+                                                <span v-bind:id="`CountClassIndex${index}`">({{StringUtil.nvl(filterCnt.classCnt[item.autoClass], '0')}})
+                                                </span>
+                                            </label>
+                                        </span>
+                                        <span v-if="filterChk && filterCnt.classCnt[item.autoClass] > 0">
+                                            <input type="checkbox" class="searchChk classCodes" name="ClassIndex" v-bind:id="`ClassIndex_${index}`" v-bind:value="item.autoClass" v-model="paramOptions.classCodes"/>
+                                            <label v-bind:for="`ClassIndex_${index}`">{{item.className}} 
+                                                <span v-bind:id="`CountClassIndex${index}`">({{StringUtil.nvl(filterCnt.classCnt[item.autoClass], '0')}})
+                                                </span>
+                                            </label>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h2>연료 및 구동방식</h2>
+                        <ul>
+                            <li>
+                                <input type="checkbox" name="EngineAll" id="allCheck4" value="Engine" class="searchChk" v-on:click="allClick($event, 'fuelEngineCodes')"/><label for="allCheck4">전체선택<span v-if="filterCnt.fuelEngineCnt['all'] > 0" id="TotalCountEngine">({{StringUtil.nvl(filterCnt.fuelEngineCnt['all'], '0')}})</span></label>
+                                <ul  id="SearchEngine">
+
+                                    <span v-if="!filterChk">
+                                        <li>
+                                            <input type="checkbox" name="Engine" id="Engine0" class="searchChk fuelEngineCodes" value="G2WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['G2WD'], '0') == '0'"/>
+                                            <label for="Engine0">가솔린/2WD
+                                                <span id="CountEngineG2WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['G2WD'], '0')}})</span>
+                                            </label>
+                                        </li>
+                                    </span>
+
+                                    <span v-if="!filterChk">
+                                        <li>
+                                            <input type="checkbox" name="Engine" id="Engine1" class="searchChk fuelEngineCodes" value="G4WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['G4WD'], '0') == '0'"/>
+                                            <label for="Engine1">가솔린/4WD
+                                                <span id="CountEngineG4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['G4WD'], '0')}})                                               
+                                                </span>
+                                            </label>
+                                        </li>
+                                    </span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Engine" id="Engine2" class="searchChk fuelEngineCodes" value="E2WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['E2WD'], '0') == '0'"/><label for="Engine2">가솔린 + 전기/2WD<span id="CountEngineE2WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['E2WD'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Engine" id="Engine3" class="searchChk fuelEngineCodes" value="E4WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['E4WD'], '0') == '0'"/><label for="Engine3">가솔린 + 전기/4WD<span id="CountEngineE4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['E4WD'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Engine" id="Engine4" class="searchChk fuelEngineCodes" value="D2WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['D2WD'], '0') == '0'"/><label for="Engine4">디젤/2WD<span id="CountEngineD2WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['D2WD'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Engine" id="Engine5" class="searchChk fuelEngineCodes" value="D4WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['D4WD'], '0') == '0'"/><label for="Engine5">디젤/4WD<span id="CountEngineD4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['D4WD'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Engine" id="Engine6" class="searchChk fuelEngineCodes" value="P4WD" v-model="paramOptions.fuelEngineCodes" :disabled="StringUtil.nvl(filterCnt.fuelEngineCnt['P4WD'], '0') == '0'"/><label for="Engine6">전기/4WD<span id="CountEngineP4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['P4WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['G2WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine0" class="searchChk fuelEngineCodes" value="G2WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine0">가솔린/2WD<span id="CountEngineG2WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['G2WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['G4WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine1" class="searchChk fuelEngineCodes" value="G4WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine1">가솔린/4WD<span id="CountEngineG4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['G4WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['E2WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine2" class="searchChk fuelEngineCodes" value="E2WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine2">가솔린 + 전기/2WD<span id="CountEngineE2WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['E2WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['E4WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine3" class="searchChk fuelEngineCodes" value="E4WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine3">가솔린 + 전기/4WD<span id="CountEngineE4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['E4WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['D2WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine4" class="searchChk fuelEngineCodes" value="D2WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine4">디젤/2WD<span id="CountEngineD2WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['D2WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['D4WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine5" class="searchChk fuelEngineCodes" value="D4WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine5">디젤/4WD<span id="CountEngineD4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['D4WD'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.fuelEngineCnt['P4WD'] > 0"><li><input type="checkbox" name="Engine" id="Engine6" class="searchChk fuelEngineCodes" value="P4WD" v-model="paramOptions.fuelEngineCodes"/><label for="Engine6">전기/4WD<span id="CountEngineP4WD">({{StringUtil.nvl(filterCnt.fuelEngineCnt['P4WD'], '0')}})</span></label></li></span>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- //연료 및 구동방식 -->
+
+                    <!-- 모델 -->
+                    <div>
+                        <h2>모델</h2>
+                        <ul>
+                            <li >
+                                <input type="checkbox" name="ModelAll" id="allCheck3" value="Model" class="searchChk" v-on:click="allClick($event, 'modelCodes')"/><label for="allCheck3">전체선택<span v-if="filterCnt.modelCnt['all'] > 0" id="TotalCountModel">({{StringUtil.nvl(filterCnt.modelCnt['all'], '0')}})</span></label>
+                                <ul id="SearchModel">
+
+                                    <li v-for="(item, index) in searchOptions.modelCodes" :key="index">
+                                        <span v-if="!filterChk">
+                                            <input type="checkbox" name="Model" v-bind:id="`Model${item.autoModel}`" v-bind:value="item.autoModel" v-model="paramOptions.modelCodes" :disabled="StringUtil.nvl(filterCnt.modelCnt[item.autoModel], '0') == '0'" class="searchChk modelCodes"/>
+                                            <label v-bind:for="`Model${item.autoModel}`">{{item.modelName}}
+                                                <span v-bind:id="`CountModel${item.autoModel}`">({{StringUtil.nvl(filterCnt.modelCnt[item.autoModel], '0')}})</span>
+                                            </label>
+                                        </span>
+                                        <span v-if="filterChk && filterCnt.modelCnt[item.autoModel] > 0">
+                                            <input type="checkbox" name="Model" v-bind:id="`Model${item.autoModel}`" v-bind:value="item.autoModel" v-model="paramOptions.modelCodes" class="searchChk modelCodes"/>
+                                            <label v-bind:for="`Model${item.autoModel}`">{{item.modelName}}
+                                                <span v-bind:id="`CountModel${item.autoModel}`">({{StringUtil.nvl(filterCnt.modelCnt[item.autoModel], '0')}})
+                                                </span>
+                                            </label>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- //모델 -->
+                    <div>
+                        <h2>연식</h2>
+                        <ul>
+                            <li>
+                                <input type="checkbox" name="CarYearAll" id="allCheck8" value="CarYear" class="searchChk" v-on:click="allClick($event, 'yearCodes')" />
+                                <label for="allCheck8">전체선택
+                                    <span v-if="filterCnt.yearCnt['all'] > 0" id="TotalCountCarYear">({{StringUtil.nvl(filterCnt.yearCnt['all'], '0')}})
+                                    </span>
+                                </label>       
+                                <ul id="SearchCarYear">
+                                    <li v-for="(item, index) in searchOptions.yearCodes" :key="index">
+                                        <span v-if="!filterChk">
+                                            <input v-if="item !== '이전' && item !== '9999'" type="checkbox" name="CarYear" v-bind:id="`CarYear${item}`" v-bind:value="item" class="searchChk yearCodes" v-model="paramOptions.yearCodes" :disabled="StringUtil.nvl(filterCnt.yearCnt[item], '0') == '0'"/>
+                                            <label v-if="item !== '이전' && item !== '9999'" v-bind:for="`CarYear${item}`">{{item}}
+                                                <span v-bind:id="`CountCarYear${item}`">({{StringUtil.nvl(filterCnt.yearCnt[item], '0')}})
+                                                </span>
+                                            </label>
+                                        </span>
+                                        <span v-if="filterChk && filterCnt.yearCnt[item] > 0">
+                                            <input v-if="item !== '이전' && item !== '9999'" type="checkbox" name="CarYear" v-bind:id="`CarYear${item}`" v-bind:value="item" class="searchChk yearCodes" v-model="paramOptions.yearCodes"/>
+                                            <label v-if="item !== '이전' && item !== '9999'" v-bind:for="`CarYear${item}`">{{item}}
+                                                <span v-if="filterCnt.yearCnt[item] > 0" v-bind:id="`CountCarYear${item}`">({{StringUtil.nvl(filterCnt.yearCnt[item], '0')}})
+                                                </span>
+                                            </label>
+                                        </span>
+                                    </li> 
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- //default -->
+
+                <!-- detail 검색 -->
+                <div class="detailSearch" v-show="showDetail">
+                    <!-- 가격대 -->
+                    <div>
+                        <h2>가격대</h2>
+                        <ul>
+                            <li>
+                                <input type="checkbox" name="PriceAll" id="allCheck5" value="Price" class="searchChk" v-on:click="allClick($event, 'priceFilterCodes')" /><label for="allCheck5">전체선택<span v-if="filterCnt.priceCnt['all'] > 0" id="TotalCountPrice">({{StringUtil.nvl(filterCnt.priceCnt['all'], '0')}})</span></label>
+                                <ul id="SearchPrice">
+                                    <span v-if="!filterChk">
+                                        <li>
+                                            <input type="checkbox" name="Price" id="Price1" class="searchChk priceFilterCodes" value="1" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['1'], '0') == '0'"/>
+                                            <label for="Price1">
+                                                <span>1천만원 이하</span> 
+                                                <span id="CountPrice1">({{StringUtil.nvl(filterCnt.priceCnt['1'], '0')}})
+                                                </span>
+                                            </label>
+                                        </li>
+                                    </span>
+                                    <span v-if="!filterChk">
+                                        <li>
+                                            <input type="checkbox" name="Price" id="Price2" class="searchChk priceFilterCodes" value="2" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['2'], '0') == '0'"/>
+                                            <label for="Price2">
+                                                <span>2천만원~3천만원</span> 
+                                                <span id="CountPrice2">({{StringUtil.nvl(filterCnt.priceCnt['2'], '0')}})
+                                                </span>
+                                            </label>
+                                        </li>
+                                    </span>
+
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price3" class="searchChk priceFilterCodes" value="3" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['3'], '0') == '0'"/><label for="Price3"><span>3천만원~4천만원</span> <span id="CountPrice3">({{StringUtil.nvl(filterCnt.priceCnt['3'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price4" class="searchChk priceFilterCodes" value="4" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['4'], '0') == '0'"/><label for="Price4"><span>4천만원~5천만원</span> <span id="CountPrice4">({{StringUtil.nvl(filterCnt.priceCnt['4'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price5" class="searchChk priceFilterCodes" value="5" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['5'], '0') == '0'"/><label for="Price5"><span>5천만원~6천만원</span> <span id="CountPrice5">({{StringUtil.nvl(filterCnt.priceCnt['5'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price6" class="searchChk priceFilterCodes" value="6" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['6'], '0') == '0'"/><label for="Price6"><span>6천만원~7천만원</span> <span id="CountPrice6">({{StringUtil.nvl(filterCnt.priceCnt['6'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price7" class="searchChk priceFilterCodes" value="7" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['7'], '0') == '0'"/><label for="Price7"><span>7천만원~8천만원</span> <span id="CountPrice7">({{StringUtil.nvl(filterCnt.priceCnt['7'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price8" class="searchChk priceFilterCodes" value="8" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['8'], '0') == '0'"/><label for="Price8"><span>8천만원~9천만원</span> <span id="CountPrice8">({{StringUtil.nvl(filterCnt.priceCnt['8'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price9" class="searchChk priceFilterCodes" value="9" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['9'], '0') == '0'"/><label for="Price9"><span>9천만원~10천만원</span> <span id="CountPrice9">({{StringUtil.nvl(filterCnt.priceCnt['9'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Price" id="Price10" class="searchChk priceFilterCodes" value="10" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['10'], '0') == '0'"/><label for="Price10"><span>1억원 이상</span> <span id="CountPrice10">({{StringUtil.nvl(filterCnt.priceCnt['10'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['1']"><li><input type="checkbox" name="Price" id="Price1" class="searchChk priceFilterCodes" value="1" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['1'], '0') == '0'"/><label for="Price1"><span>1천만원 이하</span> <span id="CountPrice1">({{StringUtil.nvl(filterCnt.priceCnt['1'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['2']"><li><input type="checkbox" name="Price" id="Price2" class="searchChk priceFilterCodes" value="2" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['2'], '0') == '0'"/><label for="Price2"><span>2천만원~3천만원</span> <span id="CountPrice2">({{StringUtil.nvl(filterCnt.priceCnt['2'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['3']"><li><input type="checkbox" name="Price" id="Price3" class="searchChk priceFilterCodes" value="3" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['3'], '0') == '0'"/><label for="Price3"><span>3천만원~4천만원</span> <span id="CountPrice3">({{StringUtil.nvl(filterCnt.priceCnt['3'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['4']"><li><input type="checkbox" name="Price" id="Price4" class="searchChk priceFilterCodes" value="4" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['4'], '0') == '0'"/><label for="Price4"><span>4천만원~5천만원</span> <span id="CountPrice4">({{StringUtil.nvl(filterCnt.priceCnt['4'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['5']"><li><input type="checkbox" name="Price" id="Price5" class="searchChk priceFilterCodes" value="5" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['5'], '0') == '0'"/><label for="Price5"><span>5천만원~6천만원</span> <span id="CountPrice5">({{StringUtil.nvl(filterCnt.priceCnt['5'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['6']"><li><input type="checkbox" name="Price" id="Price6" class="searchChk priceFilterCodes" value="6" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['6'], '0') == '0'"/><label for="Price6"><span>6천만원~7천만원</span> <span id="CountPrice6">({{StringUtil.nvl(filterCnt.priceCnt['6'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['7']"><li><input type="checkbox" name="Price" id="Price7" class="searchChk priceFilterCodes" value="7" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['7'], '0') == '0'"/><label for="Price7"><span>7천만원~8천만원</span> <span id="CountPrice7">({{StringUtil.nvl(filterCnt.priceCnt['7'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['8']"><li><input type="checkbox" name="Price" id="Price8" class="searchChk priceFilterCodes" value="8" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['8'], '0') == '0'"/><label for="Price8"><span>8천만원~9천만원</span> <span id="CountPrice8">({{StringUtil.nvl(filterCnt.priceCnt['8'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['9']"><li><input type="checkbox" name="Price" id="Price9" class="searchChk priceFilterCodes" value="9" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['9'], '0') == '0'"/><label for="Price9"><span>9천만원~10천만원</span> <span id="CountPrice9">({{StringUtil.nvl(filterCnt.priceCnt['9'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.priceCnt['10']"><li><input type="checkbox" name="Price" id="Price10" class="searchChk priceFilterCodes" value="10" v-model="paramOptions.priceFilterCodes" :disabled="StringUtil.nvl(filterCnt.priceCnt['10'], '0') == '0'"/><label for="Price10"><span>1억원 이상</span> <span id="CountPrice10">({{StringUtil.nvl(filterCnt.priceCnt['10'], '0')}})</span></label></li></span>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- //가격대 -->
+
+                    <!-- 주행거리 -->
+                    <div>
+                        <h2>주행거리</h2>
+                        <ul>
+                            <li>
+                                <input type="checkbox" name="DistanceAll" id="allCheck6" value="Distance" class="searchChk"  v-on:click="allClick($event, 'distanceFilterCodes')" /><label for="allCheck6">전체선택<span v-if="filterCnt.distanceCnt['all'] > 0" id="TotalCountDistance">({{StringUtil.nvl(filterCnt.distanceCnt['all'], '0')}})</span></label>
+                                <ul id="SearchDistance">
+                                    <span v-if="!filterChk">
+                                        <li>
+                                            <input type="checkbox" name="Distance" id="Distance1" class="searchChk distanceFilterCodes" value="0" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['0'], '0') == '0'"/>
+                                            <label for="Distance1">10,000km 이하 
+                                                <span id="CountDistance1">({{StringUtil.nvl(filterCnt.distanceCnt['0'], '0')}})</span>
+                                            </label>
+                                        </li>
+                                    </span>
+                                    <span v-if="!filterChk">
+                                        <li>
+                                            <input type="checkbox" name="Distance" id="Distance2" class="searchChk distanceFilterCodes" value="1" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['1'], '0') == '0'"/>
+                                            <label for="Distance2">10,000km~20,000km 
+                                                <span id="CountDistance2">({{StringUtil.nvl(filterCnt.distanceCnt['1'], '0')}})</span>
+                                            </label>
+                                        </li>
+                                    </span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance3" class="searchChk distanceFilterCodes" value="2" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['2'], '0') == '0'"/><label for="Distance3">20,000km~30,000km <span id="CountDistance3">({{StringUtil.nvl(filterCnt.distanceCnt['2'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance4" class="searchChk distanceFilterCodes" value="3" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['3'], '0') == '0'"/><label for="Distance4">30,000km~40,000km <span id="CountDistance4">({{StringUtil.nvl(filterCnt.distanceCnt['3'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance5" class="searchChk distanceFilterCodes" value="4" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['4'], '0') == '0'"/><label for="Distance5">40,000km~50,000km <span id="CountDistance5">({{StringUtil.nvl(filterCnt.distanceCnt['4'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance6" class="searchChk distanceFilterCodes" value="5" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['5'], '0') == '0'"/><label for="Distance6">50,000km~60,000km <span id="CountDistance6">({{StringUtil.nvl(filterCnt.distanceCnt['5'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance7" class="searchChk distanceFilterCodes" value="6" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['6'], '0') == '0'"/><label for="Distance7">60,000km~70,000km <span id="CountDistance7">({{StringUtil.nvl(filterCnt.distanceCnt['6'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance8" class="searchChk distanceFilterCodes" value="7" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['7'], '0') == '0'"/><label for="Distance8">70,000km~80,000km <span id="CountDistance8">({{StringUtil.nvl(filterCnt.distanceCnt['7'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance9" class="searchChk distanceFilterCodes" value="8" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['8'], '0') == '0'"/><label for="Distance9">80,000km~90,000km <span id="CountDistance9">({{StringUtil.nvl(filterCnt.distanceCnt['8'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance10" class="searchChk distanceFilterCodes" value="9" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['9'], '0') == '0'"/><label for="Distance10">90,000km~100,000km <span id="CountDistance10">({{StringUtil.nvl(filterCnt.distanceCnt['9'], '0')}})</span></label></li></span>
+                                    <span v-if="!filterChk"><li><input type="checkbox" name="Distance" id="Distance11" class="searchChk distanceFilterCodes" value="10" v-model="paramOptions.distanceFilterCodes" :disabled="StringUtil.nvl(filterCnt.distanceCnt['10'], '0') == '0'"/><label for="Distance11">100,000Km 이상 <span id="CountDistance11">({{StringUtil.nvl(filterCnt.distanceCnt['10'], '0')}})</span></label></li></span>
+
+                                    <span v-if="filterChk && filterCnt.distanceCnt['0'] > 0"><li><input type="checkbox" name="Distance" id="Distance1" class="searchChk distanceFilterCodes" value="0" v-model="paramOptions.distanceFilterCodes"/><label for="Distance1">10,000km 이하 <span v-if="filterCnt.distanceCnt['0'] > 0" id="CountDistance1">({{StringUtil.nvl(filterCnt.distanceCnt['0'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['1'] > 0"><li><input type="checkbox" name="Distance" id="Distance2" class="searchChk distanceFilterCodes" value="1" v-model="paramOptions.distanceFilterCodes"/><label for="Distance2">10,000km~20,000km <span v-if="filterCnt.distanceCnt['1'] > 0" id="CountDistance2">({{StringUtil.nvl(filterCnt.distanceCnt['1'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['2'] > 0"><li><input type="checkbox" name="Distance" id="Distance3" class="searchChk distanceFilterCodes" value="2" v-model="paramOptions.distanceFilterCodes"/><label for="Distance3">20,000km~30,000km <span v-if="filterCnt.distanceCnt['2'] > 0" id="CountDistance3">({{StringUtil.nvl(filterCnt.distanceCnt['2'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['3'] > 0"><li><input type="checkbox" name="Distance" id="Distance4" class="searchChk distanceFilterCodes" value="3" v-model="paramOptions.distanceFilterCodes"/><label for="Distance4">30,000km~40,000km <span v-if="filterCnt.distanceCnt['3'] > 0" id="CountDistance4">({{StringUtil.nvl(filterCnt.distanceCnt['3'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['4'] > 0"><li><input type="checkbox" name="Distance" id="Distance5" class="searchChk distanceFilterCodes" value="4" v-model="paramOptions.distanceFilterCodes"/><label for="Distance5">40,000km~50,000km <span v-if="filterCnt.distanceCnt['4'] > 0" id="CountDistance5">({{StringUtil.nvl(filterCnt.distanceCnt['4'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['5'] > 0"><li><input type="checkbox" name="Distance" id="Distance6" class="searchChk distanceFilterCodes" value="5" v-model="paramOptions.distanceFilterCodes"/><label for="Distance6">50,000km~60,000km <span v-if="filterCnt.distanceCnt['5'] > 0" id="CountDistance6">({{StringUtil.nvl(filterCnt.distanceCnt['5'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['6'] > 0"><li><input type="checkbox" name="Distance" id="Distance7" class="searchChk distanceFilterCodes" value="6" v-model="paramOptions.distanceFilterCodes"/><label for="Distance7">60,000km~70,000km <span v-if="filterCnt.distanceCnt['6'] > 0" id="CountDistance7">({{StringUtil.nvl(filterCnt.distanceCnt['6'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['7'] > 0"><li><input type="checkbox" name="Distance" id="Distance8" class="searchChk distanceFilterCodes" value="7" v-model="paramOptions.distanceFilterCodes"/><label for="Distance8">70,000km~80,000km <span v-if="filterCnt.distanceCnt['7'] > 0" id="CountDistance8">({{StringUtil.nvl(filterCnt.distanceCnt['7'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['8'] > 0"><li><input type="checkbox" name="Distance" id="Distance9" class="searchChk distanceFilterCodes" value="8" v-model="paramOptions.distanceFilterCodes"/><label for="Distance9">80,000km~90,000km <span v-if="filterCnt.distanceCnt['8'] > 0" id="CountDistance9">({{StringUtil.nvl(filterCnt.distanceCnt['8'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['9'] > 0"><li><input type="checkbox" name="Distance" id="Distance10" class="searchChk distanceFilterCodes" value="9" v-model="paramOptions.distanceFilterCodes"/><label for="Distance10">90,000km~100,000km <span v-if="filterCnt.distanceCnt['9'] > 0" id="CountDistance10">({{StringUtil.nvl(filterCnt.distanceCnt['9'], '0')}})</span></label></li></span>
+                                    <span v-if="filterChk && filterCnt.distanceCnt['10'] > 0"><li><input type="checkbox" name="Distance" id="Distance11" class="searchChk distanceFilterCodes" value="10" v-model="paramOptions.distanceFilterCodes"/><label for="Distance11">100,000Km 이상 <span v-if="filterCnt.distanceCnt['10'] > 0" id="CountDistance11">({{StringUtil.nvl(filterCnt.distanceCnt['10'], '0')}})</span></label></li></span>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- //주행거리 -->
+                    <!-- 전시장 -->
+                    <div>
+                        <h2>전시장</h2>
+                        <ul>
+                            <li>
+                                <input type="checkbox" name="BranchAll" id="allCheck7" value="Branch" class="searchChk" v-on:click="allClick($event, 'brofCodes')" />
+                                <label for="allCheck7">전체선택
+                                    <span v-if="filterCnt.brofCnt['all'] > 0" id="TotalCountBranch">({{StringUtil.nvl(filterCnt.brofCnt['all'], '0')}})</span>
+                                </label>
+                                <ul id="SearchBranch">
+                                    <li v-for="(item, index) in brofList" :key="index">
+                                        <span v-if="!filterChk">
+                                            <input type="checkbox" name="Branch" v-bind:id="`Branch${item.brofCd}${item.brofType}`" class="searchChk brofCodes"  v-bind:value="`${item.brofCd}${item.brofType}`" v-model="paramOptions.brofCodes" :disabled="StringUtil.nvl(filterCnt.brofCnt[item.brofCd + item.brofType], '0') == '0'"/>
+                                            <label v-bind:for="`Branch${item.brofCd}${item.brofType}`">{{item.brofNm}} 
+                                                <span v-bind:id="`CountBranch${item.brofCd}${item.brofType}`">({{StringUtil.nvl(filterCnt.brofCnt[item.brofCd + item.brofType], '0')}})</span>
+                                            </label>
+                                        </span>
+
+                                        <span v-if="filterChk && filterCnt.brofCnt[item.brofCd + item.brofType] > 0">
+                                            <input type="checkbox" name="Branch" v-bind:id="`Branch${item.brofCd}${item.brofType}`" class="searchChk brofCodes"  v-bind:value="`${item.brofCd}${item.brofType}`" v-model="paramOptions.brofCodes"/>
+                                            <label v-bind:for="`Branch${item.brofCd}${item.brofType}`">{{item.brofNm}} 
+                                                <span v-if="filterCnt.brofCnt[item.brofCd + item.brofType] > 0" v-bind:id="`CountBranch${item.brofCd}${item.brofType}`">({{StringUtil.nvl(filterCnt.brofCnt[item.brofCd + item.brofType], '0')}})</span>
+                                            </label>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- //전시장 -->
+                    <!-- 연식 -->
+                    <div>
+                        <h2>&nbsp;</h2>
+                        <ul> 
+                        </ul>
+                    </div>
+                    <!-- //연식 -->
+                </div>
+            </form>
+            <!-- //detail 검색 -->
+
+
+            <!-- btn -->
+            <div class="check">
+                <p><input type="checkbox" name="StarClass" id="StarClass" class="" value="Y" v-model="paramOptions.isCert"/><label for="StarClass">Mercedes-Benz Certified 인증 차량만 보기</label></p>
+                <div class="fr">
+                    <button type="reset" class="btn st02" v-on:click="resetParam">선택옵션 초기화</button>
+                    <button type="button" class="btn st02 detailSrch" v-on:click="clickDetail">상세검색 열기</button>
+                </div>
+            </div>
+            <!-- //btn -->
+            <!-- 검색결과 -->
+            <div class="result">
+                <div class="reFl">
+                    <select name="OrderType" id="OrderType" v-model="paramOptions.orderType">
+                        <option value="8" >추천매물순</option>
+                        <option value="0" >인기순</option>
+                        <option value="1" >최근등록순</option>
+                        <option value="2" >낮은가격순</option>
+                        <option value="3" >높은가격순</option>
+                        <option value="4" >낮은연식순</option>
+                        <option value="5" >높은연식순</option>
+                        <option value="6" >낮은주행거리순</option>
+                        <option value="7" >높은주행거리순</option>
+                    </select>
+                    <select name="ListCount" id="ListCount" v-model="paramOptions.listCount">
+                        <option value="12" selected="selected">12개 보기</option>
+                        <option value="24">24개 보기</option>
+                        <option value="36">36개 보기</option>
+                        <option value="48">48개 보기</option>
+                    </select>
+                </div>
+                <div class="rdCe">총 <span id="SearchCount">{{getTotalCount}}</span>대의 검색결과가 있습니다.</div>
+                <div class="listBtn reFr">
+                    <button type="button" class="icoBtn ico01" v-bind:class="showView === 'row'?'on':''" v-on:click="clickShow">일렬로 보기</button>
+                    <button type="button" class="icoBtn ico02" v-bind:class="showView !== 'row'?'on':''" v-on:click="clickShow">큰 사진으로 보기</button>
+                </div>
+            </div>
+            <!-- //검색결과 -->
+            <div id="CarList">
+                <!-- 검색결과 list -->
+                
+                <ul v-if="carList !== null" class="cpoList" v-bind:class="showView"> <!-- class="row tile"-->      
+
+
+                    <li v-for="(item, idx) in carList" v-bind:key="idx">
+                        <router-link v-bind:to="`/car/carInfo/${item.goodsNo}`" title="새창 열림" target="_blank">
+                            <figure class="thumb">
+                                <img v-if="!item.carImg" src="@/static/images/testImg/visual_default.jpg" alt="">
+                                <img v-else v-bind:src="`${Constant.config.resourceURI}${item.carImg}`" v-bind:onError="`javascript:this.src='${require('@/static/images/testImg/visual_default.jpg')}'`">
+                                <!-- <img v-bind:src="item.carImg" alt="테스트차량" /> -->
+                                <figcaption>차량 이미지</figcaption>
+                            </figure>
+                        </router-link>
+                        <div class="txtArea">
+                            <h3><router-link v-bind:to="`car/carInfo/${item.goodsNo}`">{{item.title}}</router-link></h3>
+                            <p class="price">
+
+                                <span>{{StringUtil.formatCommas(item.price)}}</span>만원
+
+                            </p>
+
+                            <div class="info infoList" style="width:590px;">
+                                <ul>
+                                    <li>판매중</li>
+                                    <li>{{StringUtil.nvl(Constant.code.gearType[item.gearType], '알 수 없음')}}</li>
+                                    <li>{{item.autoYearNm}}년식</li>
+                                    <li>
+                                        <span class="register">차량최초등록일 &#58; </span>
+                                        <span>{{StringUtil.strToDate(item.frRegYmd)}}</span>
+                                    </li>
+                                    <li v-if="item.memo != null && item.memo != ''"><b>{{item.memo}}</b></li>
+                                </ul>
+                            </div>
+
+                            <mark v-if="item.isHot==='Y'" class="label hot">HOT</mark>
+                            &nbsp;
+                            <mark v-if="item.isStarClass==='Y'" class="label confirm">Mercedes-Benz Certified 인증 중고차</mark>
+
+                            &nbsp;
+                            <div class="type">
+                                <dl class="fuel">
+                                    <dt>연료타입</dt>
+                                    <dd>{{StringUtil.nvl(Constant.code.fuelType[item.fuel], '알 수 없음')}}</dd>
+                                </dl>
+                                <dl class="mileage">
+                                    <dt>주행거리</dt>
+                                    <dd>{{StringUtil.formatCommas(item.distance)}}Km</dd>
+                                </dl>
+                                <dl class="crash">
+                                    <dt>사고유무</dt>
+                                    <dd>{{StringUtil.nvl(Constant.code.yn[item.isAcc], '알 수 없음')}}</dd>
+                                </dl>
+                                <dl class="color">
+                                    <dt>외부색상</dt>
+                                    <dd>{{item.exColorNm}}</dd>
+                                </dl>
+                                <dl class="shop">
+                                    <dt>판매전시장</dt>
+                                    <dd>{{item.brofNm}}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <dl class="shpwroom">
+                            <dt>{{item.brofNm}}</dt>
+                            <dd>{{item.phoneNo}}</dd>
+                        </dl>
+                    </li>
+                </ul>
+                <div v-else class="noneResult">검색결과가 없습니다.</div>
+
+                <!-- 검색결과 list -->
+
+                <span style="display:none;" id="ResultCount">{{getTotalCount}}</span>
+                <!-- pagging -->
+
+                <div class="paging">
+                    <a v-if="pageInfo.prev" style="pointer:cursor" v-on:click="getCarList(pageInfo.startPage - 1)" class="first">이전 SCALE</a>
+
+                    <a v-if="pageInfo.currentPage > 1" style="pointer:cursor" v-on:click="getCarList(pageInfo.currentPage - 1)" class="prev">이전 PAGE</a>
+
+                    <span v-for="(item, idx) in pageArr" v-bind:key="idx">
+                        <a style="pointer:cursor;" v-on:click="getCarList(item)" v-bind:class="item === pageInfo.currentPage?'on':''">{{item}}</a>                            
+                    </span>
+                    
+                    <a v-if="pageInfo.currentPage < pageInfo.totalPage" style="pointer:cursor" v-on:click="getCarList(pageInfo.currentPage + 1)" class="next">다음 PAGE</a>
+
+                    <a v-if="pageInfo.next" style="pointer:cursor" v-on:click="getCarList(pageInfo.endPage + 1)" class="last">다음 scale</a>
+                </div>
+
+                <!-- //pagging -->
+
+            </div>
+        </section>
+        <!-- //search -->
+    </div>
+</template>
+
+<script>
+
+
+    import {
+        Hooper,
+        Slide,
+        //Pagination as HooperPagination
+        Navigation as HooperNavigation
+    } from 'hooper';
+    import 'hooper/dist/hooper.css';
+
+    export default {
+
+
+
+        components: {
+            Hooper,
+            Slide,
+            HooperNavigation,
+        },
+
+
+
+        mounted : function() {
+            var paramArr = Object.keys(this.$route.query);
+                
+            for (var i = 0; i < paramArr.length; i++) {
+                if (!this.paramOptions[paramArr[i]]) {
+                    //TODO : QueryString 처리가 필요함 네이버 트래킹에 의한
+                } else {
+                    this.paramOptions[paramArr[i]].push(this.$route.query[paramArr[i]]);
+                }
+            }
+
+            var blnCookie = this.getCookie("infoCookie");
+            if(!blnCookie) {
+                this.$modal.show('infoPop');
+            }
+
+            this.getRecommandList();
+            this.getBnnrsList();
+            this.getCarList();
+            this.getBrofList();
+            this.getClassList();
+            this.getCarFilterCnt();
+        },
+
+
+
+        data : function() {
+            return {
+
+                bnnrs : [],
+                //차량 리스트
+                carList : [],
+                //페이징 정보
+                pageInfo : {},
+                //추천 차량 리스트
+                carRecommandList : [],
+                //지점 정보
+                brofList : [],
+                //해당 페이지에서 보일 페이지들
+                pageArr : [],
+                //상세검색필터 보일지 말지 선택
+                showDetail : false,
+                //일렬로 보기/큰사진으로 보기 - 추가가 있을지 모르므로 변수로 관리한다.
+                //일렬 - row
+                //큰사진 - tile
+                //다만 위의 비즈니스에서는 큰 사진을 line이 아닐때로 표현한다(추가시 수정 필요)
+                showView : 'row',
+                //MB
+                brandCode : 'AB050401',
+                //검색필터 옵션들
+                searchOptions : {
+                    //클래스
+                    classCodes : [],
+                    //모델
+                    modelCodes : [],
+                    //연식
+                    yearCodes : [],
+                    //거리필터
+                    distanceFilterCodes : [],
+                    //가격필터
+                    priceFilterCodes : [],
+                    //연료/엔진
+                    fuelEngineCodes : [],
+                    //지점코드들
+                    brofCodes : [],
+                },
+                //파라미터들
+                paramOptions : {
+                    //클래스
+                    classCodes : [],
+                    //모델
+                    modelCodes : [],
+                    //연식
+                    yearCodes : [],
+                    //거리필터
+                    distanceFilterCodes : [],
+                    //가격필터
+                    priceFilterCodes : [],
+                    //연료/엔진
+                    fuelEngineCodes : [],
+                    //지점코드들
+                    brofCodes : [],
+                    //1페이지당 보일 차량 갯수
+                    listCount : '12',
+                    //인증여부
+                    isCert : [],
+                    //정렬순서
+                    orderType : '8',
+                },
+                //검색필터 수량들
+                filterCnt : {
+                    //클래스
+                    classCnt : {},
+                    //모델
+                    modelCnt : {},
+                    //연식
+                    yearCnt : {},
+                    //연료 및 구동
+                    fuelEngineCnt : {},
+                    //가격대
+                    priceCnt : {},
+                    //주행거리대
+                    distanceCnt : {},
+                    //전시장
+                    brofCnt : {},
+                },
+                popChecked : false,
+                // popChecked2 : false,
+                filterChk : false
+            }
+        },
+
+
+        methods : {
+            
+            // 팝업 닫기
+            POPUPClOSE : function() {
+                var todayDate = new Date();
+                var value = "done";
+
+                todayDate.setHours(23,59,59,999);
+
+                // 쿠키 설정 체크
+                if(this.popChecked) { 
+                    document.cookie = "infoCookie=" + escape( value ) + "; path=/; expires=" + todayDate + ";"
+                } 
+
+                this.$modal.hide('infoPop');
+            },
+        
+
+            //차량 리스트 검색
+            getCarList : function(page) {
+                //window.console.log(page);
+                page = !page ? 0 : page - 1;
+
+
+                //성능체크가 좀 필요할거같음
+                //window.console.time();
+                this.axios.get(`${this.Constant.config.baseURI}/car/${this.Constant.config.brofType}/carList`, {
+                    //처음 조회시에도 초기 파라미터 있을 수 있음
+                    //배열일 경우 배열을 String으로 변경하여 보내주어야 함
+                    //여기서는 join을 이용하여 배열을 String으로 변경해줌 seperator = ,
+                    //단, 이를 사용하기 위해서는 해당 파라미터가 배열이라는 것이 명시되고 관리되어야 함
+                    //status는 이 리스트에서는 1, 2, 3 고정이다.
+                    params : {
+                        'page' : page,
+                        'size' : this.StringUtil.nvl(this.paramOptions.listCount, '12'),
+                        'classCodes' : this.paramOptions.classCodes.join(),
+                        'modelCodes' : this.paramOptions.modelCodes.join(),
+                        'yearCodes' : this.paramOptions.yearCodes.join(),
+                        'brofCodes' : this.paramOptions.brofCodes.join(),
+                        'distanceLists' : this.paramOptions.distanceFilterCodes.join(),
+                        'priceLists' : this.paramOptions.priceFilterCodes.join(),
+                        'fuelDriveCodes' : this.paramOptions.fuelEngineCodes.join(),
+                        'orderType' : this.paramOptions.orderType,
+                        'status' : '1',
+                    },
+                }).then((response) => {
+                    this.carList    = response.data.carList||[];
+                    this.pageInfo   = response.data.pageInfo;
+                    this.pageArr    = this.PageUtil.pageInfo(response.data.pageInfo);
+                    //window.console.timeEnd();
+                });
+            },
+            //클릭시 상세검색 필터 보임
+            clickDetail : function() {
+                //true/false로 제어
+                this.showDetail = !this.showDetail;
+            },
+            //클릭시 일렬로 보기/ 큰 사진으로 보기 변경
+            clickShow : function() {
+                if (this.showView === 'row') {
+                    this.showView = 'tile';
+                } else {
+                    this.showView = 'row';
+                }
+            },
+            getCookie : function(name) {
+                var nameOfCookie = name + "=";  
+                var endOfCookie = "";
+
+                var x = 0;  
+                while ( x <= document.cookie.length )  
+                {  
+                    var y = (x+nameOfCookie.length);  
+                    if ( document.cookie.substring( x, y ) == nameOfCookie ) {  
+                        if ( (endOfCookie=document.cookie.indexOf( ";", y )) == -1 )  
+                            endOfCookie = document.cookie.length;  
+                        return unescape( document.cookie.substring( y, endOfCookie ) );  
+                    }  
+                    x = document.cookie.indexOf( " ", x ) + 1;  
+                    if ( x == 0 )  
+                        break;  
+                }  
+                return "";
+            }, 
+            //추천차량 검색
+            getRecommandList : function() {
+                //window.console.log(page);
+
+                //성능체크가 좀 필요할거같음
+                //window.console.time();
+                this.axios.get(`${this.Constant.config.baseURI}/car/${this.Constant.config.brofType}/carRecommandList`, {
+                    params : {
+                        status : '1',
+                    }
+                }).then((response) => {
+                    this.carRecommandList = response.data.recommandCarList||[];
+
+                    if(this.carRecommandList.length > 9) {
+                        this.carRecommandList.splice(9, this.carRecommandList.length);
+                    }
+
+                    //window.console.timeEnd();
+                });
+            },
+            //지점검색
+            getBrofList : function() {
+                this.axios
+                    .get(`${this.Constant.config.baseURI}/brof/${this.Constant.config.brofType}/branchList`)
+					.then((result) => {
+						//window.console.log(result);
+						this.brofList = result.data.branchList||[];
+					});
+            },
+            //필터 - 이쪽 Methods 내에서는 Object방식이든 즉시실행함수 방식이든 다 안통함
+            //프로퍼티 각개 선언방식으로 돌림
+            //AB050401 - MB 브랜드
+            getClassList : function() {
+                this.axios.get(`${this.Constant.config.baseURI}/common/car/${this.brandCode}/classList`, {
+                }).then((response) => {
+                    this.searchOptions.classCodes = response.data.classList||[];
+                    this.getModelsList();
+                });
+            },
+            //모델 리스트 검색
+            getModelsList : function() {
+                this.axios.get(`${this.Constant.config.baseURI}/common/car/modelList`, {
+                    params : {
+                        'brandCodeArr' : this.brandCode,
+                        'classCodeArr' : this.paramOptions.classCodes.join(),
+                    }
+                }).then((response) => {
+                    this.searchOptions.modelCodes = response.data.modelList||[];
+                    this.getYearsList();
+                });
+            },
+            //연식 리스트 검색
+            getYearsList : function() {
+                this.axios.get(`${this.Constant.config.baseURI}/common/car/yearList`, {
+                    /*  params : {
+                        'brandCodeArr' : this.brandCode,
+                        'classCodeArr' : this.paramOptions.classCodes.join(),
+                        'modelCodeArr' : this.paramOptions.modelCodes.join(),
+                    } */
+                }).then((response) => {
+                    this.searchOptions.yearCodes = response.data.yearList||[];
+                });
+            },
+            //필터 수량 검색
+            getCarFilterCnt : function(name) {
+
+                const params = {
+                        'classCodes' : this.paramOptions.classCodes.join(),
+                        'modelCodes' : this.paramOptions.modelCodes.join(),
+                        'yearCodes' : this.paramOptions.yearCodes.join(),
+                        'brofCodes' : this.paramOptions.brofCodes.join(),
+                        'distanceLists' : this.paramOptions.distanceFilterCodes.join(),
+                        'priceLists' : this.paramOptions.priceFilterCodes.join(),
+                        'fuelDriveCodes' : this.paramOptions.fuelEngineCodes.join(),
+                        'orderType' : this.paramOptions.orderType,
+                        'status' : '1'
+                    }
+
+                // window.console.log("params = " + params);
+                
+                if(params.classCodes != null && params.classCodes != '') {
+                    this.filterChk = true;
+                } else if(params.modelCodes != null && params.modelCodes != '') {
+                    this.filterChk = true;
+                } else if(params.yearCodes != null && params.yearCodes != '') {
+                    this.filterChk = true;
+                } else if(params.brofCodes != null && params.brofCodes != '') {
+                    this.filterChk = true;
+                } else if(params.distanceLists != null && params.distanceLists != '') {
+                    this.filterChk = true;
+                } else if(params.priceLists != null && params.priceLists != '') {
+                    this.filterChk = true;
+                } else if(params.fuelDriveCodes != null && params.fuelDriveCodes != '') {
+                    this.filterChk = true;
+                } else {
+                    this.filterChk = false;
+                }
+
+                //POST인 경우 params로 감싸지 않음
+                this.axios.get(`${this.Constant.config.baseURI}/car/${this.Constant.config.brofType}/carFilterCntList`, {
+                    params : params
+                }).then((response) => {
+                    //클래스, 모델, 연식, 연료 및 구동, 가격대, 주행거리대, 전시장
+                    var setArr = ['class', 'model', 'year', 'fuelEngine', 'priceFilter', 'distanceFilter', 'brof'];
+
+                    setArr.forEach((item) => {
+                        item = item.replace('Filter', '');
+
+                        this.filterCnt[item+"Cnt"] = response.data.carFilterCntList[item+"Filter"];
+                    });
+
+                });
+            },
+            //전체선택 클릭(자기자신, 파라미터 코드명)
+            allClick : function($event, paramName) {
+                //dom 속성중 refs가 this에 들어가는 것을 이용
+                //꼭 refs속성이 아니라도 $el등을 이용 가능 v-for을 쓰지 않을 경우 refs는 배열로 들어가지 않음 el을 쓰는 것이 나을거같다.
+                //https://jsfiddle.net/f706L1tk/ 참조하였음
+                
+                window.console.log("click");
+
+                //watch에 걸리지 않도록 임시변수를 생성하여 값이 한꺼번에 변경되도록 해야 할 듯
+                var tempArr = [],
+                    domList = [],
+                    i = 0;
+                
+                //window.console.log(this.$el.getElementsByClassName(paramName));
+                if ($event.target.checked) {
+                    domList = this.$el.getElementsByClassName(paramName);
+
+                    for(; i<domList.length; i++) {
+                        tempArr.push(domList[i].value);
+                    }
+                }
+                //이것으로 엎어쳐서 파라미터가 다 들어간 상태로 watch 1번만 유도
+                this.paramOptions[paramName] = tempArr;
+            },
+            //파라미터 리셋(초기화)
+            resetParam : function() {
+                //파라미터는 모두 배열로 초기화하나
+                //1페이지당 리스트 갯수인 "listCount"와 "orderType"은 초기화하지 않는다.
+                var $this   = this,
+                    i       = 1;
+                
+                for(;i < 9 ; i++) {
+                    if (i !== 2) {
+                        document.querySelector('#allCheck' + i).checked  = false;
+                    }
+                }
+
+                Object.keys(this.paramOptions).filter((paramOption) => {
+                    if (paramOption === 'listCount' || paramOption === 'orderType') {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }).forEach(function(item){
+                    //filter로 걸러진 것들은 모두 배열로 초기화
+                    //유감스럽지만 해당 scope에서는 this가 VueComponent가 아니다 위에서 받아야 할듯
+                    $this.paramOptions[item] = [];
+                });
+                
+            },
+        
+            //slide 배너 리스트
+            getBnnrsList : function(){
+                this.axios.get(`${this.Constant.config.baseURI}/visual/C/P/visualList`)
+                .then((response) => {
+                    this.bnnrs = response.data.visualList||[];
+                    //window.console.log(this.bnnrs);
+                });
+            }
+        },
+
+
+
+
+
+        computed : {
+            //총 게시글 갯수
+            getTotalCount : function() {
+                return this.StringUtil.formatCommas(this.pageInfo["totalCount"]||'');
+            },
+            //파라미터 새로운 Object로 새성
+            computedModel : function() {
+                //deep copy시 value, oldvalue 트래킹 handler의 value, Oldvalue에 들어갈 Object가 해당 Object.assign에 의해 서로 다른 Object가 반환된다. 
+                return Object.assign({}, this.paramOptions);
+            }
+        },
+
+
+
+
+
+
+        watch : {
+            //Object 안의 Object를 직접 watch할 경우는 문자열로 선언
+            //검색 파라미터가 검색되었을 경우 페이지를 1로 초기화하고 검색을 실행한다.
+            computedModel : {
+                handler : function (value, oldValue) {
+                    var key = Object.keys(value),
+                        i = 0,
+                        name;
+
+                    for(;i < key.length; i++) {
+                        if(!Object.is(oldValue[key[i]], value[key[i]])) {
+                            name = key[i].replace("Codes", "");    //Class, Model등만 나올 수 있도록
+                        }
+                    }
+
+                    //window.console.log(name);
+
+                    //그리고 변경된 필터에 따른 필터 수량을 재검색
+                    this.getCarList(1);
+                    this.getCarFilterCnt(name);
+                },
+                //Object 안의 Object를 감지시에는 Deep체크 필수
+                deep : true
+            },
+            $route : function() {
+                var paramArr = Object.keys(this.$route.query);
+                
+                this.paramOptions = {
+                    //클래스
+                    classCodes : [],
+                    //모델
+                    modelCodes : [],
+                    //연식
+                    yearCodes : [],
+                    //거리필터
+                    distanceFilterCodes : [],
+                    //가격필터
+                    priceFilterCodes : [],
+                    //연료/엔진
+                    fuelEngineCodes : [],
+                    //지점코드들
+                    brofCodes : [],
+                    //1페이지당 보일 차량 갯수
+                    listCount : '12',
+                    //인증여부
+                    isCert : [],
+                    //정렬순서
+                    orderType : '8',
+                }//파라미터 초기화
+                
+                for (var i = 0; i < paramArr.length; i++) {
+                    this.paramOptions[paramArr[i]].push(this.$route.query[paramArr[i]]);
+
+                }
+                
+                this.getCarList();
+                this.getCarFilterCnt();
+            }
+        }
+
+
+
+
+    }
+</script>
+
+<style src="@/static/common/css/jquery.bxslider.css"></style>
+
+<style lang="css" scoped>
+    .thumbnail{overflow:hidden;}
+    .thumbnail .recommend_sale li{width:171px;}
+	.thumbnail .recommend_sale a{color:#fff;}
+	.thumbnail .recommend_sale a:hover{color:#fff !important;text-decoration:underline;}
+	.thumbnail .recommend_sale .car_img{overflow:hidden;display:block;margin-bottom:10px;width:171px;height:129px;}
+	.thumbnail .recommend_sale .car_img img{width:100%;height:100%;transition: all .5s;}
+	.thumbnail .recommend_sale a:hover .car_img img{transform: scale(1.05);}
+
+</style>
+
+<!-- 추천 매물 화살표 표시되도록 수정 -->
+<style>
+    .icon-arrowLeft{margin-left: -50px; width:40px; height:40px;}
+    .icon-arrowRight{margin-right: -45px; width:40px; height:40px;}
+    .hooper-list{width:160%}
+</style>

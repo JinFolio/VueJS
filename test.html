@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<title>JavaScript</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!--        <script src="vue.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+
+        
+		<style>
+			body {
+				font-family: Consolas, monospace;
+			}
+		</style>
+	</head>
+	<body>
+    
+        
+    <script>
+        
+        
+        
+        
+        
+            
+//const CarList = [
+//    { 
+//        "goodsNo": "GD20120044001", "title": "CLS 300 d AMG Line", "status": "1", "distance": 14329, "price": 7900, "isStarClass": "Y", "carImg": "/hansung_homepage/img/car/GD20120044/1b60821238f540378c6f9066fab01546.jpg", "isAcc": "N", "exColorNm": "Obsidian Black", "brofNm": "용답전시장", "brofCd": "H17000", "brofType": "C", "fuel": "D", "gearType": "A", "frRegYmd": "20200103", "phoneNo": "02-6390-1000", "autoYear": "808", "autoYearNm": "2019", "isHot": "Y", "isBrandQuarantee": null, "isPerformance": "Y", "memo": "" 
+//    } 
+//    ,{ 
+//        "goodsNo": "GD20110476001", "title": "AMG A 35 4MATIC", "status": "1", "distance": 255, "price": 5600, "isStarClass": "Y", "carImg": "/hansung_homepage/img/car/GD20110476/565764c286474be3a2430a087cda0728.jpg", "isAcc": "N", "exColorNm": "Polar White", "brofNm": "용답전시장", "brofCd": "H17000", "brofType": "C", "fuel": "G", "gearType": "A", "frRegYmd": "20201117", "phoneNo": "02-6390-1000", "autoYear": "901", "autoYearNm": "2020", "isHot": "Y", "isBrandQuarantee": null, "isPerformance": "Y", "memo": "" 
+//    } 
+//    ,{ 
+//        "g  oodsNo": "GD20110358001", "title": "E220 d EXCL", "status": "1", "distance": 79987, "price": 4400, "isStarClass": "Y", "carImg": "/hansung_homepage/img/car/GD20110358/176c25b0c799472d90f884ff9c42afcc.jpg", "isAcc": "N", "exColorNm": "Iridium Silver", "brofNm": "용답전시장", "brofCd": "H17000", "brofType": "C", "fuel": "D", "gearType": "A", "frRegYmd": "20170131", "phoneNo": "02-6390-1000", "autoYear": "519", "autoYearNm": "2017", "isHot": "Y", "isBrandQuarantee": null, "isPerformance": "Y", "memo": "" 
+//    }  
+//    ,{ 
+//        "goodsNo": "GD20100068001", "title": "E 450 4MATIC EXCL", "status": "1", "distance": 3080, "price": 8500, "isStarClass": "Y", "carImg": "/hansung_homepage/img/car/GD20100068/510f387a443746c6a21eb076a92d5689.jpg", "isAcc": "N", "exColorNm": "Selenite Grey", "brofNm": "용답전시장", "brofCd": "H17000", "brofType": "C", "fuel": "G", "gearType": "A", "frRegYmd": "20200602", "phoneNo": "02-6390-1000", "autoYear": "860", "autoYearNm": "2020", "isHot": "Y", "isBrandQuarantee": null, "isPerformance": "Y", "memo": ""
+//    },
+//
+//
+//]
+//        
+        
+        //"https://jsonplaceholder.typicode.com/posts/1" 라는 샘플 API를 불러온다.
+fetch("https://jsonplaceholder.typicode.com/posts/1")
+// fetch 는 프로미스를 리턴하므로
+// then / catch 구문을 사용할 수 있다.
+.then(data => {
+    return data.json();
+})
+.then(post => {
+    alert(post.title);
+})
+        </script>
+        
+        
+            <div id="appList">
+        <!-- JSON 데이터를 읽어서 항목의 번호와 이름, 나이를 하나씩 표시함 -->
+        <ul v-for="(item, index) in aPersons">
+            <li>
+                <!-- index는 항목의 순서를 숫자로 표시 -->
+                <p>번호: {{ index }} </p>
+                <p>이름: {{ item.name }} </p>
+                <p>나이: {{ item.age }} </p>
+            </li>
+        </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#appList',
+            // 고객의 이름, 나이를 값으로 하는 JSON 데이터 정의
+            data: {
+                aPersons: [{
+                        name: '홍길동',
+                        age: 27
+                    },
+                    {
+                        name: '이순신',
+                        age: 30
+                    },
+                    {
+                        name: '김유신',
+                        age: 40
+                    }
+                ]
+            }
+        });
+    </script>
+        
+    <div id="app-2">
+        <h1>{{bFlag}}</h1>
+        <p v-if="bFlag">당첨!!</p>
+        <p v-else="bFlag">꽝! 다음기회에</p>
+    </div>
+    <script>
+        var app3 = new Vue({
+            el: '#app-2',
+            data: {
+                //난수(0~1) 생성 후 0.5보다 크면 true 아니면 false로 지정
+                bFlag: Math.random() > 0.5
+            }
+        })
+    </script>
+        
+        
+    
+    <div id="app-4">
+        <ol>
+            <li v-for="todo in todos">
+                {{ todo.text }}
+            </li>
+        </ol>
+    </div>
+
+    <script>
+        var app4 = new Vue({
+            el: '#app-4',
+            data: {
+                todos: [
+                    { text: 'JavaScript 배우기' },
+                    { text: 'Vue 배우기' },
+                    { text: '무언가 멋진 것을 만들기' }
+                ]
+            }
+        })
+
+    </script>
+       
+        
+        
+    <div id="app-5">
+        <p>{{ message }}</p>
+        <button v-on:click="reverseMessage">메시지 뒤집기</button>
+    </div>
+
+    <script>
+        var app5 = new Vue({
+            el: '#app-5',
+            data: {
+                message: '안녕하세요! Vue.js!'
+            },
+            methods: {
+                reverseMessage: function () {
+                    this.message = this.message.split('').reverse().join('')
+                }
+            }
+        })
+
+    </script>
+
+        
+             
+<!--
+<div id="app">
+    <ul>
+        <li v-for="product in products">
+            {{ product }}
+        </li>    
+    </ul>
+</div>
+
+<script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        product:[ 
+            {'안녕하세요 Vue!'},
+            {'늘어나는 테스트'},
+            {'자동이네 신기'}
+        ]
+      }
+    })
+</script>  
+-->
+        
+        
+        
+        
+        
+  
+        
+        
+        
+        
+<!--        <script src="vue.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+             
+        
+    </body>
+
+    </html>
